@@ -1,8 +1,28 @@
 import "dotenv/config";
 import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import { Server, Socket } from 'socket.io';
 import { router } from './routes';
 
 const app = express();
+app.use(cors());
+
+//Cria um servidor
+const serverHttp = http.createServer(app);
+
+//Acesso a conexão cliente
+const io = new Server(
+  serverHttp,
+  {
+    cors: {
+      origin: "*"//Habilitado para tudo
+    }
+  });
+
+io.on("connection", (socket) => {
+  console.log(`Usuário conectado! É nois parça ${socket.id}!!`);
+});//Ouvindo evento
 
 app.use(express.json());
 
@@ -18,4 +38,4 @@ app.get("/signin/callback", (req, res) => {
   return res.json(code);
 })
 
-app.listen(4000, () => console.log("Tá bombando!!!!!!!"));
+export { serverHttp, io };
